@@ -1,5 +1,5 @@
 """
-Module for defining temporal workflows.
+Module for testing temporal workflows.
 """
 
 from uuid import uuid4

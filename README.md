@@ -108,5 +108,5 @@ stateDiagram-v2
     Cancel update: p * 3 events (update accepted + update complete + exec complete)
   ```
 
-- [ ] Replay test
+- [x] Replay test
 - [ ] Iterate
