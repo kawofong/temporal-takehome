@@ -32,7 +32,7 @@ class CustomerRewardAccount:
         self._is_active: bool = True
         self._user_id: str | None = None
         self._create_time: datetime | None = None
-        self._terminate_time: datetime | None = None
+        self._cancel_time: datetime | None = None
         self._update_count: int = 0
 
     @workflow.run
@@ -66,7 +66,7 @@ class CustomerRewardAccount:
                 workflow.logger.info(
                     "Terminating reward account for %s at %s",
                     self._user_id,
-                    self._terminate_time,
+                    self._cancel_time,
                 )
                 return CustomerRewardAccountStatus(
                     level=self._level,
@@ -101,7 +101,7 @@ class CustomerRewardAccount:
         Terminates the reward account.
         """
         self._is_active = False
-        self._terminate_time = workflow.now()
+        self._cancel_time = workflow.now()
         return CustomerRewardAccountStatus(
             level=self._level,
             points=self._points,
