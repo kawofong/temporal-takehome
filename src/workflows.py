@@ -11,7 +11,12 @@ from temporalio.common import RetryPolicy
 with workflow.unsafe.imports_passed_through():
     from activities import get_user
     from constants import CustomerRewardLevel
-    from models import CustomerRewardAccountInput, CustomerRewardAccountStatus, UserInfo
+    from models import (
+        AddPointInput,
+        CustomerRewardAccountInput,
+        CustomerRewardAccountStatus,
+        UserInfo,
+    )
 
 
 @workflow.defn
@@ -59,10 +64,6 @@ class CustomerRewardAccount:
                     is_active=self._is_active,
                 )
 
-        # TODO(kawo): create a handler to add points
-
-        # TODO(kawo): promote level based on points
-
     @workflow.query
     def query_reward_status(self) -> CustomerRewardAccountStatus:
         return CustomerRewardAccountStatus(
@@ -75,6 +76,22 @@ class CustomerRewardAccount:
     def terminate(self) -> CustomerRewardAccountStatus:
         self._is_active = False
         self._terminate_time = workflow.now()
+        return CustomerRewardAccountStatus(
+            level=self._level,
+            points=self._points,
+            is_active=self._is_active,
+        )
+
+    @workflow.update
+    def add_points(self, inp: AddPointInput) -> CustomerRewardAccountStatus:
+        workflow.logger.info("Adding points", inp.user_id)
+        self._points += inp.points
+        if 500 <= self._points < 1000:
+            self._level = CustomerRewardLevel.GOLD
+        elif self._points >= 1000:
+            self._level = CustomerRewardLevel.PLATINUM
+        else:
+            self._level = CustomerRewardLevel.BASIC
         return CustomerRewardAccountStatus(
             level=self._level,
             points=self._points,

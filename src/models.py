@@ -23,3 +23,8 @@ class CustomerRewardAccountStatus:
     level: CustomerRewardLevel
     points: int
     is_active: bool
+
+
+@dataclass
+class AddPointInput:
+    points: int
