@@ -7,9 +7,9 @@ import asyncio
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from activities import say_hello
+from activities import get_user
 from constants import TASK_QUEUE_NAME
-from workflows import SayHello
+from workflows import CustomerRewardAccount
 
 
 async def main():
@@ -22,8 +22,8 @@ async def main():
     worker = Worker(
         client,
         task_queue=TASK_QUEUE_NAME,
-        workflows=[SayHello],
-        activities=[say_hello],
+        workflows=[CustomerRewardAccount],
+        activities=[get_user],
     )
     print("\nWorker started, ctrl+c to exit\n")
     await worker.run()
