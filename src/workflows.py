@@ -96,7 +96,7 @@ class CustomerRewardAccount:
         )
 
     @workflow.update
-    def cancel(self) -> CustomerRewardAccountStatus:
+    async def cancel(self) -> CustomerRewardAccountStatus:
         """
         Terminates the reward account.
         """
@@ -109,7 +109,7 @@ class CustomerRewardAccount:
         )
 
     @workflow.update
-    def add_points(self, inp: AddPointInput) -> CustomerRewardAccountStatus:
+    async def add_points(self, inp: AddPointInput) -> CustomerRewardAccountStatus:
         """
         Adds points to the reward account.
         """
