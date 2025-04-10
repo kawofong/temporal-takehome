@@ -73,7 +73,7 @@ class CustomerRewardAccount:
         )
 
     @workflow.update
-    def terminate(self) -> CustomerRewardAccountStatus:
+    def cancel(self) -> CustomerRewardAccountStatus:
         self._is_active = False
         self._terminate_time = workflow.now()
         return CustomerRewardAccountStatus(
@@ -84,8 +84,9 @@ class CustomerRewardAccount:
 
     @workflow.update
     def add_points(self, inp: AddPointInput) -> CustomerRewardAccountStatus:
-        workflow.logger.info("Adding points", inp.user_id)
+        workflow.logger.info("Adding points", self._user_id, inp.points)
         self._points += inp.points
+        self._points = max(self._points, 0)  # prevent negative points
         if 500 <= self._points < 1000:
             self._level = CustomerRewardLevel.GOLD
         elif self._points >= 1000:

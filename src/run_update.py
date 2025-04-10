@@ -18,7 +18,7 @@ async def main():
     handle = client.get_workflow_handle_for(
         CustomerRewardAccount.run, MOCK_USER.user_id
     )
-    account_status = await handle.execute_update(CustomerRewardAccount.terminate)
+    account_status = await handle.execute_update(CustomerRewardAccount.cancel)
     # account_status = await handle.execute_update(
     #     CustomerRewardAccount.add_points, AddPointInput(points=400)
     # )

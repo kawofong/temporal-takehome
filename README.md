@@ -82,5 +82,5 @@ stateDiagram-v2
     - Given user has not enrolled in the reward program, when the user requests to leave the program, then the operation should fail.
 - [x] Bootstrap development environment
 - [x] Write code
-- [ ] Write test
+- [x] Write test
 - [ ] Iterate
