@@ -18,9 +18,14 @@ with workflow.unsafe.imports_passed_through():
         UserInfo,
     )
 
+MAX_UPDATE_OPERATION_COUNT = 5000
+
 
 @workflow.defn
 class CustomerRewardAccount:
+    """
+    Customer reward account workflow."""
+
     def __init__(self):
         self._level: CustomerRewardLevel = CustomerRewardLevel.BASIC
         self._points: int = 0
@@ -28,6 +33,7 @@ class CustomerRewardAccount:
         self._user_id: str | None = None
         self._create_time: datetime | None = None
         self._terminate_time: datetime | None = None
+        self._update_count: int = 0
 
     @workflow.run
     async def run(self, inp: CustomerRewardAccountInput) -> CustomerRewardAccountStatus:
@@ -50,7 +56,11 @@ class CustomerRewardAccount:
         )
 
         while True:
-            await workflow.wait_condition(lambda: not self._is_active)
+            await workflow.wait_condition(
+                lambda: not self._is_active
+                or self._update_count >= MAX_UPDATE_OPERATION_COUNT
+            )
+
             # If account is inactive, then return and complete the workflow
             if not self._is_active:
                 workflow.logger.info(
@@ -64,8 +74,21 @@ class CustomerRewardAccount:
                     is_active=self._is_active,
                 )
 
+            # When number of update operations exceeds 5,000, continue-as-new the workflow.
+            # 5,000 update operations roughly equals to 25,000 events in history.
+            if self._update_count >= MAX_UPDATE_OPERATION_COUNT:
+                workflow.logger.info(
+                    "Continuing as new because update count [%i] exceeds %i.",
+                    self._update_count,
+                    MAX_UPDATE_OPERATION_COUNT,
+                )
+                workflow.continue_as_new(inp)
+
     @workflow.query
     def query_reward_status(self) -> CustomerRewardAccountStatus:
+        """
+        Returns the current status of the reward account.
+        """
         return CustomerRewardAccountStatus(
             level=self._level,
             points=self._points,
@@ -74,6 +97,9 @@ class CustomerRewardAccount:
 
     @workflow.update
     def cancel(self) -> CustomerRewardAccountStatus:
+        """
+        Terminates the reward account.
+        """
         self._is_active = False
         self._terminate_time = workflow.now()
         return CustomerRewardAccountStatus(
@@ -84,7 +110,11 @@ class CustomerRewardAccount:
 
     @workflow.update
     def add_points(self, inp: AddPointInput) -> CustomerRewardAccountStatus:
-        workflow.logger.info("Adding points", self._user_id, inp.points)
+        """
+        Adds points to the reward account.
+        """
+        workflow.logger.info("Adding points for %s by %i", self._user_id, inp.points)
+        self._update_count += 1
         self._points += inp.points
         self._points = max(self._points, 0)  # prevent negative points
         if 500 <= self._points < 1000:

@@ -83,4 +83,30 @@ stateDiagram-v2
 - [x] Bootstrap development environment
 - [x] Write code
 - [x] Write test
+- [x] Continue-as-new
+
+  ```text
+  Event history limit: 51_200 events and 50 MB storage
+
+  Storage:
+    Workflow input: user id (< 100B)
+    Get user activity:
+      input: user id (< 100B)
+      output: user id + name (< 100B)
+    Query:
+      output: level (num) + points (num) + is_active (bool) (< 100B)
+    Add points update:
+      input: points (num)
+      output: level (num) + points (num) + is_active (bool) (< 100B)
+    Cancel update:
+      output: level (num) + points (num) + is_active (bool) (< 100B)
+
+  Event count:
+    Workflow + activity: O(1)
+    Query: n * 0 event
+    Add points update: m * 5 events (update accepted + update complete + task scheduled + task started + task completed)
+    Cancel update: p * 3 events (update accepted + update complete + exec complete)
+  ```
+
+- [ ] Replay test
 - [ ] Iterate
