@@ -26,6 +26,27 @@ stateDiagram-v2
     Offboard --> [*]
 ```
 
+## Getting started
+
+1. Start Temporal cluster locally
+
+    ```bash
+    temporal server start-dev
+    ```
+
+1. Start worker program.
+
+    ```bash
+    uv run src/run_worker.py
+    ```
+
+1. Run Temporal workflow.
+
+    ```bash
+    uv run src/workflows.py
+    ```
+
+
 ## TODOs
 
 - [x] Learn more about how customer reward program is designed for companies (e.g. Starbucks)
@@ -51,7 +72,7 @@ stateDiagram-v2
     - Given user has enrolled in the reward program, when an user joins the reward program, then the operation should fail.
     - Given user has not enrolled in the reward program, when a client queries the user account, then the operation should fail.
     - Given user has not enrolled in the reward program, when the user requests to leave the program, then the operation should fail.
-- [ ] Bootstrap development environment
+- [x] Bootstrap development environment
 - [ ] Write code
 - [ ] Write test
 - [ ] Iterate
