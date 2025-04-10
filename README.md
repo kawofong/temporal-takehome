@@ -46,6 +46,14 @@ stateDiagram-v2
     uv run src/workflows.py
     ```
 
+## Development
+
+1. Run tests.
+
+    ```bash
+    uv run pytest
+    ```
+
 
 ## TODOs
 
@@ -73,6 +81,6 @@ stateDiagram-v2
     - Given user has not enrolled in the reward program, when a client queries the user account, then the operation should fail.
     - Given user has not enrolled in the reward program, when the user requests to leave the program, then the operation should fail.
 - [x] Bootstrap development environment
-- [ ] Write code
+- [x] Write code
 - [ ] Write test
 - [ ] Iterate
