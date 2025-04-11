@@ -68,6 +68,7 @@ class CustomerRewardAccount:
                     self._user_id,
                     self._cancel_time,
                 )
+                await workflow.wait_condition(workflow.all_handlers_finished)
                 return CustomerRewardAccountStatus(
                     level=self._level,
                     points=self._points,
@@ -82,6 +83,7 @@ class CustomerRewardAccount:
                     self._update_count,
                     MAX_UPDATE_OPERATION_COUNT,
                 )
+                await workflow.wait_condition(workflow.all_handlers_finished)
                 workflow.continue_as_new(inp)
 
     @workflow.query
