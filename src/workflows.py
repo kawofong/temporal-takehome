@@ -130,3 +130,11 @@ class CustomerRewardAccount:
             points=self._points,
             is_active=self._is_active,
         )
+
+    @add_points.validator
+    def validate_add_point(self, inp: AddPointInput) -> None:
+        """
+        Validate input point to be an integer. Reject otherwise.
+        """
+        if not isinstance(inp.points, int):
+            raise ValueError("Points must be an integer.")

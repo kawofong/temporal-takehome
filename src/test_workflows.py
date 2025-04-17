@@ -5,7 +5,7 @@ Module for testing temporal workflows.
 from uuid import uuid4
 
 import pytest
-from temporalio.client import Client
+from temporalio.client import Client, WorkflowUpdateFailedError
 from temporalio.exceptions import WorkflowAlreadyStartedError
 from temporalio.service import RPCError
 from temporalio.worker import Worker
@@ -99,6 +99,34 @@ async def test_user_earn_points(
         assert result.level == expected_level
         assert result.points == (starting_points + points_earned)
         assert result.is_active
+
+
+@pytest.mark.asyncio
+async def test_user_invalid_earn_points(
+    client: Client,
+):
+    """
+    Given user has X points,
+    When an user adds "Y" (invalid type) points,
+    Then the update operation should fail.
+    """
+    async with Worker(
+        client,
+        task_queue=TEST_TASK_QUEUE,
+        workflows=[CustomerRewardAccount],
+        activities=[get_user],
+    ):
+        user = random_user()
+        handle = await client.start_workflow(
+            CustomerRewardAccount.run,
+            user,
+            id=user.user_id,
+            task_queue=TEST_TASK_QUEUE,
+        )
+        with pytest.raises(WorkflowUpdateFailedError):
+            await handle.execute_update(
+                CustomerRewardAccount.add_points, AddPointInput(points="123")
+            )
 
 
 @pytest.mark.asyncio
