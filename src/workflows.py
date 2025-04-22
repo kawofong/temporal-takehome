@@ -38,6 +38,7 @@ class CustomerRewardAccount:
     @workflow.run
     async def run(self, inp: CustomerRewardAccountInput) -> CustomerRewardAccountStatus:
         workflow.logger.info("Creating reward account for %s", inp.user_id)
+        self._create_time = workflow.now()
         user: UserInfo = await workflow.execute_activity(
             get_user,
             inp.user_id,
@@ -50,7 +51,6 @@ class CustomerRewardAccount:
             ),
         )
         self._user_id = user.id
-        self._create_time = workflow.now()
         workflow.logger.info(
             "Reward account for %s created at %s", self._user_id, self._create_time
         )
@@ -84,7 +84,13 @@ class CustomerRewardAccount:
                     MAX_UPDATE_OPERATION_COUNT,
                 )
                 await workflow.wait_condition(workflow.all_handlers_finished)
-                workflow.continue_as_new(inp)
+                workflow.continue_as_new(
+                    CustomerRewardAccountInput(
+                        user_id=self._user_id,
+                        starting_points=self._points,
+                        starting_level=self._level,
+                    )
+                )
 
     @workflow.query
     def query_reward_status(self) -> CustomerRewardAccountStatus:

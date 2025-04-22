@@ -10,6 +10,8 @@ from constants import CustomerRewardLevel
 @dataclass
 class CustomerRewardAccountInput:
     user_id: str
+    starting_points: int = 0
+    starting_level: CustomerRewardLevel = CustomerRewardLevel.BASIC
 
 
 @dataclass
